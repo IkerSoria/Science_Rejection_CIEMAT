@@ -5,7 +5,7 @@ Online repository of research based on the LAIC questionnaire
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # BBDD_LAIC.RData file
-This is the initial raw data file from which all of LAIC's analyses are based.
+This is the initial raw data file from which all of LAIC's analysis are based.
 
 # Data_cleansing_code.R file
 This script loads a dataset from a file and processes it to create a new data frame "LAIC". The input data is stored in "BBDD_LAIC.RData", which is loaded using the "load" function. The library "dplyr" is also loaded using the "library" function.
