@@ -41,4 +41,4 @@ The penultimate code block, contains a bootstrapped structural equation model us
 Finally, the code defines a matrix m and a set of labels labels. The matrix is a 34 by 10 matrix with some elements replaced by character strings corresponding to the labels in labels. The semPaths() function is then called with various arguments to create a path diagram using the manipulated_science_model. The path diagram is drawn using the layout defined in the m matrix and the node labels defined in the labels vector. Various arguments are used to adjust the appearance of the diagram, including the color and width of edges, the size and shape of nodes, and the size and position of latent variables. The resulting diagram visualizes the relationships between the variables in the manipulated_science_model.
 
 # Important note
-The documentation found in this README file was partially generated using the chatbot ChatGPT. None other neural network generated content was employed in this repository.
+The documentation found in this README file was partially generated using the chatbot ChatGPT. No other neural network generated content was employed in this repository.
