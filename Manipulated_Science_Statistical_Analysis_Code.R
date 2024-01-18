@@ -1,11 +1,15 @@
 # Data load
 load("//cendat/u7443/w2000/Escritorio/CIEMAT/Artículo_Unai/Archivos_gitHub/LAIC.RData")
+"
+install.packages(c('dplyr','Hmisc','scales','psych','lavaan','ltm','QuantPsyc','energy','semPlot','WRS2','semptools','EnvStats','car','writexl'))
+"
 
 # Libraries
-lapply(c('dplyr','Hmisc','scales','psych','lavaan','ltm','QuantPsyc','energy','semPlot','WRS2','semptools','EnvStats','car'), 
+lapply(c('dplyr','Hmisc','scales','psych','lavaan','ltm','QuantPsyc','energy','semPlot','WRS2','semptools','EnvStats','car','writexl'), 
        require, character.only = TRUE)
 
 # Functions
+#CLICK TO FOLD/UNFOLD#####################################################################################################
 reorder11 <- function(x) {ifelse(x == 0, 10, 
                                  ifelse(x == 1, 9, 
                                         ifelse(x == 2, 8,
@@ -27,7 +31,34 @@ flattenCorrMatrix <- function(cormat, pmat) {
   )
 }
 
+"A very handy function to transpose the results of the correlation:"
+transpose_and_customize <- function(df) {
+  # Initialize a new dataframe to store the transposed data
+  transposed_df <- data.frame()
+  # Set the number of rows to transpose at a time (48 in this case)
+  rows_per_transpose <- 35
+  # Calculate the number of iterations required
+  num_iterations <- ceiling(nrow(df) / rows_per_transpose)
+  # Loop through the dataframe and transpose the required rows at a time
+  for (i in 1:num_iterations) {
+    start_row <- (i - 1) * rows_per_transpose + 1
+    end_row <- min(i * rows_per_transpose, nrow(df))
+    # Extract the specified rows from the third column and transpose
+    transposed_chunk <- t(df[start_row:end_row, "cor_1"])
+    # Convert the transposed chunk into a dataframe and append to the result dataframe
+    transposed_df <- rbind(transposed_df, transposed_chunk)
+  }
+  
+  # Add column names to the transposed dataframe
+  col_names <- as.character(df[1:35, "Var1"])
+  colnames(transposed_df) <- col_names
+  return(transposed_df)
+}
+
+##########################################################################################################################
+
 # Data processing
+#CLICK TO FOLD/UNFOLD#####################################################################################################
 LAIC["Ideología"][LAIC["Ideología"] == 99] <- NA
 LAIC <- LAIC %>% filter(Ideología < 99)
 
@@ -40,14 +71,13 @@ colnames(worldview_variables) <- c("npe3r","npe2r","Universalismor","idprogre2r"
 LAIC <- cbind(LAIC, worldview_variables)
 
 LAIC$manipula <- rowSums(LAIC[c("Nu_15", "Nu_16", "Nu_36", "Nu_44")])
-LAIC$polarisation <- rowSums(LAIC[c("polariza1", "polariza2", "polariza3", "dogmat1", "dogmat2", "dogmat3")])
+LAIC$dogmatism <- rowSums(LAIC[c("polariza1", "polariza2", "polariza3", "dogmat1", "dogmat2", "dogmat3")])
 LAIC$conspira_cionismo <- rowSums(LAIC[c("conspiragen1", "conspiragen2", "conspiracien1", "conspiracien2")])
 LAIC$worldview <- scales::rescale(rowSums(data.frame(LAIC[c("idconserva1", "idconserva2", "idconserva3", "idconserva4","npe1","npe3r","npe2r","Universalismor","idprogre2r","idprogre3r")])), to = c(0, 100))
 LAIC$ideologia_multidimensional <- rowSums(LAIC[c("worldview", "Ideología")])
+LAIC$critical_thinking <- rowSums(LAIC[c("pensacrit2","pensacrit3","pensacrit4","menteab3","pensalog1","necontrol1")])
 
-df_model_items <- LAIC[c("Nu_15", "Nu_16", "Nu_36", "Nu_44","polariza1", "polariza2", "polariza3", "dogmat1", "dogmat2", "dogmat3",
-                         "conspiragen1", "conspiragen2", "conspiracien1", "conspiracien2","worldview", "Ideología")]
-df_scales <- LAIC[c("manipula","polarisation","conspira_cionismo","ideologia_multidimensional")]
+df_scales <- LAIC[c("manipula","dogmatism","conspira_cionismo","ideologia_multidimensional")]
 df_worldview <- LAIC[c("idconserva1", "idconserva2", "idconserva3", "idconserva4","npe1","npe3r","npe2r","Universalismor","idprogre2r","idprogre3r")]
 
 LAIC$age6 <- ifelse((LAIC$Edad == 1 | LAIC$Edad == 2), 1,
@@ -62,12 +92,23 @@ LAIC$education5 <- ifelse((LAIC$Nivel_Estudio == 0 | LAIC$Nivel_Estudio == 1 | L
                                       ifelse(LAIC$Nivel_Estudio == 8, 4,
                                              ifelse((LAIC$Nivel_Estudio == 9 | LAIC$Nivel_Estudio == 10), 5, 99)))))
 
+science_reject_variables <- as.data.frame(apply(LAIC[c('Nu_1','Nu_8','Nu_13','Nu_20r','Nu_21r','Nu_25','Nu_26','Nu_34','Nu_43r','Nu_45r','Nu_53r')], 2, reorder11))
+colnames(science_reject_variables) <- c('Nu_1r','Nu_8r','Nu_13r','Nu_20','Nu_21','Nu_25r','Nu_26r','Nu_34r','Nu_43','Nu_45','Nu_53')
+LAIC <- cbind(LAIC, science_reject_variables)
+df_model_items <- LAIC[c('Nu_1r','Nu_8r','Nu_13r','Nu_25r','Nu_26r','Nu_34r','pensacrit2','pensacrit3','pensacrit4','menteab3','pensalog1',
+                         'necontrol1','conspiragen1','conspiragen2','conspiracien1','conspiracien2','idconserva2','npe1','idconserva1',
+                         'idconserva2','idconserva4','npe1','npe3r','npe2r','Universalismor','idprogre2r','idprogre3r','dogmat2',
+                         'polariza1','polariza2','polariza3','dogmat1','dogmat3','idconserva1','idconserva4')]
+rm(manipula_variables,worldview_variables,science_reject_variables,df_scales,df_worldview)
+##########################################################################################################################
+
 # Descriptive statistics
-univariate_normality <- data.frame(sapply(df_model_items, shapiro.test)[1:2,],sapply(df_worldview, shapiro.test)[1:2,])
-outlier_detection <- data.frame(sapply(df_model_items, rosnerTest)[13,],sapply(df_worldview, rosnerTest)[13,])
+#CLICK TO FOLD/UNFOLD#####################################################################################################
+univariate_normality <- data.frame(sapply(df_model_items, shapiro.test)[1:2,])
+outlier_detection <- data.frame(sapply(df_model_items, rosnerTest)[13,])
 
 model_descriptives <- data.frame(sapply(df_model_items, function(x) mean(x, trim=0.2)), sapply(df_model_items, mad), sapply(df_model_items, min),
-                        sapply(df_model_items, max))
+                                 sapply(df_model_items, max))
 model_descriptives <- cbind(index = row.names(model_descriptives), model_descriptives)
 names(model_descriptives) <- c("Items","Trimmed mean*","NMAD","Min","Max")
 row.names(model_descriptives) <- NULL
@@ -79,184 +120,80 @@ row.names(worldview_descriptives) <- NULL
 
 age_table <- data.frame(table(LAIC$edad6), prop.table(table(LAIC$edad6)))
 education_table <- data.frame(table(LAIC$education5), prop.table(table(LAIC$education5)))
+##########################################################################################################################
 
-alpha(LAIC[, c("Nu_15", "Nu_16", "Nu_36", "Nu_44")])
-omega(LAIC[, c("Nu_15", "Nu_16", "Nu_36", "Nu_44")])
 
-alpha(LAIC[, c("polariza1", "polariza2", "polariza3", "dogmat1", "dogmat2", "dogmat3")])
-omega(LAIC[, c("polariza1", "polariza2", "polariza3", "dogmat1", "dogmat2", "dogmat3")])
 
-alpha(LAIC[, c("idconserva1", "idconserva2", "idconserva3", "idconserva4","npe1","npe3r","npe2r","Universalismor","idprogre2r","idprogre3r")], check.keys=TRUE)
-omega(LAIC[, c("idconserva1", "idconserva2", "idconserva3", "idconserva4","npe1","npe3r","npe2r","Universalismor","idprogre2r","idprogre3r")])
+"SEM Models"
 
-alpha(LAIC[, c("conspiragen1", "conspiragen2", "conspiracien1", "conspiracien2")])
-omega(LAIC[, c("conspiragen1", "conspiragen2", "conspiracien1", "conspiracien2")],rotate="simplimax")
+"
+Mirar de sacar los supuestos del SEM para este modelo.
+Mirar justificaciones como se hace en Nature Human Behaviour
 
-alpha(LAIC[, c("worldview", "Ideología")])
-omega(LAIC[, c("worldview", "Ideología")], nfactors=1)
+Mirar de sacar el modelo con conservadurismo por un lado y progresismo por otro.
+"
 
-# Kendall Rank Coefficient Correlation of the scales
-idx <- expand.grid(colnames(df_scales), colnames(df_scales))
-pvals <- apply(idx, 1, function(i){
-  x <- df_scales[,i[[1]]]
-  y <- df_scales[,i[[2]]]
-  cor.test(x, y, method = "kendall")$p.value
-})
-pvals <- cbind.data.frame(idx, pvals = p.adjust(pvals, "fdr"))
-cors <- cor(df_scales, method = "kendall")
-cors <- reshape2::melt(cors)
+#CLICK TO FOLD/UNFOLD#####################################################################################################
+# SCIENCE REJECTION MODEL FINAL
+science_rejection_model_v3 <- '
+# 1º Latent variables Rejection of Science,
+science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
+critical_thinking_lat =~ pensacrit2+pensacrit3+pensacrit4+menteab3+pensalog1+necontrol1
+conspiracionism =~ conspiragen1+conspiragen2+conspiracien1+conspiracien2+idconserva2+npe1
+ideology_lat =~ idconserva1+idconserva2+idconserva4+npe1+npe3r+npe2r+Universalismor+idprogre2r+idprogre3r+dogmat2
+dogmatism_lat =~ polariza1+polariza2+polariza3+dogmat1+dogmat2+dogmat3+idconserva1+idconserva4
 
-if (identical(cors[,1:2], pvals[,1:2])) {
-  df <- cbind.data.frame(pvals, cor = cors[,3])
-}
+# 2º Path
+science_rejection ~ critical_thinking_lat + conspiracionism + ideology_lat + dogmatism_lat
 
-df$cor <- as.character(round(df$cor ,digit=2))
-
-df <- df %>% mutate(cor_1=case_when(pvals >0.05 & cor<1 ~ paste(cor, "",sep = ""),
-                                    pvals >0.01 & pvals<=0.05 & cor<1 ~ paste(cor, "*",sep = ""),
-                                    pvals >0.001 & pvals<=0.01 & cor<1 ~ paste(cor, "**",sep = ""),
-                                    pvals <=0.001 & cor<1 ~ paste(cor, "***",sep = "")))
-
-"SEM"
-set.seed(2022)
-
-# Multivariate normality tests
-mult.norm(df_model_items)$mult.test
-mvnorm.etest(df_model_items, R=10000)
-
-# Multicolinearity testing with correlations between variables using the Kendall Rank Coefficient Correlation
-idx <- expand.grid(colnames(df_model_items), colnames(df_model_items))
-pvals <- apply(idx, 1, function(i){
-  x <- df_model_items[,i[[1]]]
-  y <- df_model_items[,i[[2]]]
-  cor.test(x, y, method = "kendall")$p.value
-})
-pvals <- cbind.data.frame(idx, pvals = p.adjust(pvals, "fdr"))
-cors <- cor(df_model_items, method = "kendall")
-cors <- reshape2::melt(cors)
-
-if (identical(cors[,1:2], pvals[,1:2])) {
-  df <- cbind.data.frame(pvals, cor = cors[,3])
-}
-
-df$cor <- as.character(round(df$cor ,digit=2))
-
-df <- df %>% mutate(cor_1=case_when(pvals >0.05 & cor<1 ~ paste(cor, "",sep = ""),
-                                    pvals >0.01 & pvals<=0.05 & cor<1 ~ paste(cor, "*",sep = ""),
-                                    pvals >0.001 & pvals<=0.01 & cor<1 ~ paste(cor, "**",sep = ""),
-                                    pvals <=0.001 & cor<1 ~ paste(cor, "***",sep = "")))
-
-# Multicolinearity testing with random binary variable and regressions
-LAIC$binary <- rbinom(nrow(LAIC), 1, 0.5)
-vif_model_manipula <- lm(binary ~ Nu_15 + Nu_16 + Nu_36 + Nu_44, data=LAIC)
-vif(vif_model_manipula)
-vif_model_polarizacion <- lm(binary ~ polariza1 + polariza2 + polariza3 + dogmat1 + dogmat2 + dogmat3, data=LAIC)
-vif(vif_model_polarizacion)
-vif_model_ideologia <- lm(binary ~ worldview + Ideología, data=LAIC)
-vif(vif_model_ideologia)
-vif_model_conspiracionismo <- lm(binary ~ conspiragen1 + conspiragen2 + conspiracien1 + conspiracien2, data=LAIC)
-vif(vif_model_conspiracionismo)
-
-# Outlier testing
-outlier_IDs <- c(68,75,221,233,300,324,328,362,498,572,904)
-LAIC_no_outliers <- subset(LAIC, !ID %in% outlier_IDs)
-
-manipulated_science_outlier_test <- '
-# 1º Latent variables Manipulated Science, Polarisation, Ideology and Conspiracism
-Manipula_lat =~ Nu_15 + Nu_16 + Nu_36 + Nu_44
-Polarizacion_lat =~ polariza1 + polariza2 + polariza3 + dogmat1 + dogmat2 + dogmat3
-Ideologia_lat =~ worldview + Ideología
-Conspiracionismo_lat =~ conspiragen1 + conspiragen2 + conspiracien1 + conspiracien2
-
-# 2º Path from Polarisation, Ideology and Conspiracy to Manipulated Science
-Manipula_lat ~ Ideologia_lat + Polarizacion_lat + Conspiracionismo_lat
-
-# 3º Covariations
-Nu_15 ~~ Nu_44 + Nu_16
+# Covariances
+npe3r ~~ npe2r
 polariza2 ~~ dogmat1
-worldview ~~ dogmat2
-polariza1 ~~  conspiragen1
 conspiragen1 ~~ conspiragen2
-dogmat1 ~~ dogmat2
-worldview ~~ conspiracien1
-Ideología ~~  conspiragen1
+pensacrit2 ~~ pensacrit4
+npe1 ~~ npe2r
+npe1 ~~ npe3r
+polariza1 ~~ polariza3
+Universalismor ~~ idprogre3r
+pensacrit2 ~~ menteab3
+dogmat2 ~~ dogmat1
 '
-manipulated_science_model <- sem(manipulated_science, LAIC, se="bootstrap", bootstrap=10000)
-parameterEstimates(manipulated_science_model, ci=TRUE, level=0.95, boot.ci.type="perc", standardized = TRUE)
-summary(manipulated_science_model, standardized = TRUE, fit.measures=TRUE, rsquare=TRUE)
-fitmeasures(manipulated_science_model, c("cfi", "tli", "RMSEA", "srmr", "gfi", "agfi"))
+science_rejection_model_v3 <- sem(science_rejection_model_v3, LAIC, se="bootstrap", bootstrap=100)
+#parameterEstimates(science_rejection_model_v2, ci=TRUE, level=0.95, boot.ci.type="perc", standardized = TRUE)
+summary(science_rejection_model_v3, standardized = TRUE, fit.measures=TRUE, rsquare=TRUE)
+fitmeasures(science_rejection_model_v3, c("cfi", "tli", "RMSEA", "srmr", "gfi", "agfi"))
+ideas <- data.frame(modindices(science_rejection_model_v3)[order(modindices(science_rejection_model_v3)$mi, decreasing = TRUE), ])
 
+# Este modelo no tiene sentido, hemos metido dos variables de ideología en el dogmatismo y sencillamente no funcionan.
 
-"Manipulated science"
-manipulated_science <- '
-# 1º Latent variables Manipulated Science, Polarisation, Ideology and Conspiracism
-Manipula_lat =~ Nu_15 + Nu_16 + Nu_36 + Nu_44
-Polarizacion_lat =~ polariza1 + polariza2 + polariza3 + dogmat1 + dogmat2 + dogmat3
-Ideologia_lat =~ worldview + Ideología
-Conspiracionismo_lat =~ conspiragen1 + conspiragen2 + conspiracien1 + conspiracien2
+# Para justificar: science_rejection_model_v3 el "dogmatismo" explica la actitud militante
+# hacia la ciencia en el modelo de abajo.
 
-# 2º Path from Polarisation, Ideology and Conspiracy to Manipulated Science
-Manipula_lat ~ Ideologia_lat + Polarizacion_lat + Conspiracionismo_lat
+militant_attitude_model <-"
+militant_attitude=~Nu_18+Nu_46+Nu_50+Nu_55
+critical_thinking_lat =~ pensacrit2+pensacrit3+pensacrit4+menteab3+pensalog1+necontrol1
+dogmatism_lat =~ polariza1+polariza2+polariza3+dogmat1+dogmat2+dogmat3
 
-# 3º Covariations
-Nu_15 ~~ Nu_44 + Nu_16
-polariza2 ~~ dogmat1
-worldview ~~ dogmat2
-polariza1 ~~  conspiragen1
-conspiragen1 ~~ conspiragen2
-dogmat1 ~~ dogmat2
-worldview ~~ conspiracien1
-Ideología ~~  conspiragen1
-'
-manipulated_science_model <- sem(manipulated_science, LAIC, se="bootstrap", bootstrap=10000)
-parameterEstimates(manipulated_science_model, ci=TRUE, level=0.95, boot.ci.type="perc", standardized = TRUE)
-summary(manipulated_science_model, standardized = TRUE, fit.measures=TRUE, rsquare=TRUE)
-fitmeasures(manipulated_science_model, c("cfi", "tli", "RMSEA", "srmr", "gfi", "agfi"))
+# 2º Path
+militant_attitude ~ critical_thinking_lat + dogmatism_lat
 
-labels <- c(Nu_15 = "Nu15",
-            Nu_16 = "Nu16",
-            Nu_36 = "Nu36",
-            Nu_44 = "Nu44",
-            polariza1 = "P1",
-            polariza2 = "P2",
-            polariza3 = "P3",
-            dogmat1 = "D1",
-            dogmat2 = "D2",
-            dogmat3 = "D3",
-            worldview = "Worldview",
-            Ideología = "Selfpos",
-            conspiragen1 = "Cons1",
-            conspiragen2 = "Cons2",
-            conspiracien1 = "Cons3",
-            conspiracien2 = "Cons4",
-            Manipula_lat = "Manipulated",
-            Polarizacion_lat = "Dogmatism",
-            Ideologia_lat = "Ideology",
-            Conspiracionismo_lat = "Conspiracy")
-
-path<- semPaths(manipulated_science_model, what = "std",
-                residuals = FALSE, 
-                edge.color = "black", 
-                fade = FALSE, 
-                nCharNodes = 0, 
-                sizeMan = 7, 
-                sizeMan2 = 2.3,
-                sizeLat = 7,
-                esize = 2, 
-                edge.label.cex = 0.6,
-                label.cex = 1,
-                label.prop = 0.9,
-                exoCov = T,
-                edge.width = 0.8)
-path_2 <- mark_sig(path, manipulated_science_model)
-path_3 <- change_node_label(path_2, labels)
-plot(path_3)
-legend("bottomleft",
-       legend = "*=p<0.05 **=p<0.01 ***=p<0.001",
-       bty = "n",
-       cex = 0.8,
-       text.font = 6)
-legend("topleft",
-       legend = "Figure 1. Structural equation model predicting manipulated science",
-       bty = "n",
-       text.font = 6)
+# 3º Covariances
+Nu_50~~Nu_55
+polariza1~~polariza3
+menteab3~~dogmat2
+pensacrit4~~menteab3
+polariza2~~dogmat2
+pensalog1~~necontrol1
+polariza3~~dogmat3
+pensacrit3~~dogmat2
+menteab3~~dogmat1
+polariza1~~dogmat3
+pensacrit2~~dogmat2
+pensacrit4~~dogmat2
+"
+militant_attitude_model <- sem(militant_attitude_model, LAIC)
+#parameterEstimates(science_rejection_model_v3, ci=TRUE, level=0.95, boot.ci.type="perc", standardized = TRUE)
+summary(militant_attitude_model, standardized = TRUE, fit.measures=TRUE, rsquare=TRUE)
+fitmeasures(militant_attitude_model, c("cfi", "tli", "RMSEA", "srmr", "gfi", "agfi"))
+ideas <- data.frame(modindices(militant_attitude_model)[order(modindices(militant_attitude_model)$mi, decreasing = TRUE), ])
+##########################################################################################################################
