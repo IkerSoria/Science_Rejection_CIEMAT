@@ -1,5 +1,5 @@
 "Data and library load"
-load('//cendat/u7443/w2000/Escritorio/CIEMAT/Artículo_Unai/Archivos_gitHub/LAIC.RData')
+load('/LAIC.RData') # Add path here.
 "
 install.packages(c('dplyr','Hmisc','scales','psych','lavaan','ltm','QuantPsyc','energy','semPlot','WRS2','semptools','EnvStats','car','writexl','doParallel'))
 "
