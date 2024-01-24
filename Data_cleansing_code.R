@@ -1,5 +1,5 @@
 # Load of raw data
-load("/BBDD_LAIC.RData") # Your path here
+load("/BBDD_LAIC.RData") # Add path here.
  
 # Libraries
 library(dplyr)
@@ -35,4 +35,4 @@ LAIC <- data.frame(LAIC[c(1:51, 56:60, 64:70, 80:82, 96:98, 105, 52, 61:63, 99:1
                    LAIC[112],LAIC[86:89],LAIC[115:120], LAIC[126:133], LAIC[135:136], LAIC[139:143], LAIC[,c(144,145,146,149,150)], LAIC[151])
 names(LAIC)[c(83,84,85,86,93,94,121:125)] <- c("Conformidad", "Benevolencia", "Universalismo", "Seguridad", "Poder", "Logro","Racional1", "Racional2", 
                                                "Racional3", "Racional4", "Racional5")
-save(LAIC, file = "/LAIC.RData")  # Your path here
+save(LAIC, file = "/LAIC.RData")  # Add path here.
