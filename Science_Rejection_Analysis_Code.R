@@ -402,6 +402,3 @@ legend("topleft",
        text.font = 6,
        cex = 1.5)
 ##########################################################################################################################
-
-lavResiduals(science_rejection_v2)
-# Incluir el SRMR insesgado, sacar plots de los modelos.
