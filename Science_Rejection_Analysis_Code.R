@@ -104,11 +104,11 @@ registerDoParallel(cl)
 cor_matrix <- foreach(i = 1:num_vars, .combine = 'rbind') %dopar% {
   cor_row <- numeric(num_vars)
   for (j in 1:i) {
-    cor_test_result <- cor.test(df_model_items[, i], df_model_items[, j], method = "kendall")
-    cor_row[j] <- ifelse(cor_test_result$p.value <= 0.001, sprintf("%.3f***", cor_test_result$estimate),
-                         ifelse(cor_test_result$p.value <= 0.01, sprintf("%.3f**", cor_test_result$estimate),
-                                ifelse(cor_test_result$p.value <= 0.05, sprintf("%.3f*", cor_test_result$estimate),
-                                       sprintf("%.3f", cor_test_result$estimate))))
+    cor_test_result <- cor.test(df_model_items[, i], df_model_items[, j], method = 'kendall')
+    cor_row[j] <- ifelse(cor_test_result$p.value <= 0.001, sprintf('%.3f***', cor_test_result$estimate),
+                         ifelse(cor_test_result$p.value <= 0.01, sprintf('%.3f**', cor_test_result$estimate),
+                                ifelse(cor_test_result$p.value <= 0.05, sprintf('%.3f*', cor_test_result$estimate),
+                                       sprintf('%.3f', cor_test_result$estimate))))
   }
   return(cor_row)
 }
@@ -137,11 +137,11 @@ registerDoParallel(cl)
 cor_matrix <- foreach(i = 1:num_vars, .combine = 'rbind') %dopar% {
   cor_row <- numeric(num_vars)
   for (j in 1:i) {
-    cor_test_result <- cor.test(df_scales[, i], df_scales[, j], method = "kendall")
-    cor_row[j] <- ifelse(cor_test_result$p.value <= 0.001, sprintf("%.3f***", cor_test_result$estimate),
-                         ifelse(cor_test_result$p.value <= 0.01, sprintf("%.3f**", cor_test_result$estimate),
-                                ifelse(cor_test_result$p.value <= 0.05, sprintf("%.3f*", cor_test_result$estimate),
-                                       sprintf("%.3f", cor_test_result$estimate))))
+    cor_test_result <- cor.test(df_scales[, i], df_scales[, j], method = 'kendall')
+    cor_row[j] <- ifelse(cor_test_result$p.value <= 0.001, sprintf('%.3f***', cor_test_result$estimate),
+                         ifelse(cor_test_result$p.value <= 0.01, sprintf('%.3f**', cor_test_result$estimate),
+                                ifelse(cor_test_result$p.value <= 0.05, sprintf('%.3f*', cor_test_result$estimate),
+                                       sprintf('%.3f', cor_test_result$estimate))))
   }
   return(cor_row)
 }
@@ -248,36 +248,36 @@ parameterEstimates(science_rejection_v1, ci=TRUE, level=0.95, boot.ci.type='perc
 summary(science_rejection_v1, standardized = TRUE, fit.measures=TRUE, rsquare=TRUE)
 fitmeasures(science_rejection_v1, c('cfi', 'tli', 'RMSEA', 'srmr', 'gfi', 'agfi'))
 
-labels <- c(Nu_1r = "SR1",
-            Nu_8r = "SR2",
-            Nu_13r = "SR3",
-            Nu_25r = "SR4",
-            Nu_26r = "SR5",
-            Nu_34r = "SR6",
-            pensacrit2 = "CT1",
-            pensacrit3 = "CT2",
-            pensacrit4 = "CT3",
-            menteab3 = "CT4",
-            necontrol1 = "CT5",
-            conspiragen1 = "Cons1",
-            conspiragen2 = "Cons2",
-            conspiracien1 = "Cons3",
-            conspiracien2 = "Cons4",
-            Universalismo = "P1",
-            npe3 = "P2",
-            npe2 = "P3",
-            idprogre2 = "P4",
-            idprogre3 = "P5",
-            idconserva1 = "C1",
-            idconserva2 = "C2",
-            idconserva4 = "C3",
-            npe1 = "C4",
-            polariza1 = "M1",
-            polariza2 = "M2",
-            polariza3 = "M3",
-            dogmat1 = "M4",
-            dogmat2 = "M5",
-            dogmat3 = "M6",
+labels <- c(Nu_1r = 'SR1',
+            Nu_8r = 'SR2',
+            Nu_13r = 'SR3',
+            Nu_25r = 'SR4',
+            Nu_26r = 'SR5',
+            Nu_34r = 'SR6',
+            pensacrit2 = 'CT1',
+            pensacrit3 = 'CT2',
+            pensacrit4 = 'CT3',
+            menteab3 = 'CT4',
+            necontrol1 = 'CT5',
+            conspiragen1 = 'Cons1',
+            conspiragen2 = 'Cons2',
+            conspiracien1 = 'Cons3',
+            conspiracien2 = 'Cons4',
+            Universalismo = 'P1',
+            npe3 = 'P2',
+            npe2 = 'P3',
+            idprogre2 = 'P4',
+            idprogre3 = 'P5',
+            idconserva1 = 'C1',
+            idconserva2 = 'C2',
+            idconserva4 = 'C3',
+            npe1 = 'C4',
+            polariza1 = 'M1',
+            polariza2 = 'M2',
+            polariza3 = 'M3',
+            dogmat1 = 'M4',
+            dogmat2 = 'M5',
+            dogmat3 = 'M6',
             Science_rejection='Science Rejection',
             Critical_thinking='Critical Thinking',
             Conspiracionism='Conspiracionism',
@@ -285,9 +285,9 @@ labels <- c(Nu_1r = "SR1",
             Conservative='Conservative',
             Manichaeism='Manichaeism')
 
-path<- semPaths(science_rejection_v1, what = "std",
+path<- semPaths(science_rejection_v1, what = 'std',
                 residuals = FALSE, 
-                edge.color = "black", 
+                edge.color = 'black', 
                 fade = FALSE, 
                 nCharNodes = 0, 
                 sizeMan = 4, 
@@ -306,14 +306,14 @@ path_3 <- change_node_label(path_2, labels)
 curve_list_1 <- c('Critical Thinking ~~ Conspiracionism' = 15)
 path_4 <- set_curve(path_3, curve_list_1)
 plot(path_4)
-legend("bottomleft",
-       legend = "*=p<0.05 **=p<0.01 ***=p<0.001",
-       bty = "n",
+legend('bottomleft',
+       legend = '*=p<0.05 **=p<0.01 ***=p<0.001',
+       bty = 'n',
        cex = 1,
        text.font = 6)
-legend("topleft",
-       legend = "Figure 1. Science Rejection SEM model 1 (Theoretical model)",
-       bty = "n",
+legend('topleft',
+       legend = 'Figure 1. Science Rejection SEM model 1 (Theoretical model)',
+       bty = 'n',
        text.font = 6,
        cex = 1.5)
 
@@ -391,14 +391,14 @@ curve_list_1 <- c('CT1 ~~ CT4' = 2.8,'CT1 ~~ CT3' = 1.7,'P2 ~~ P3' = 1.7,'P1 ~~ 
                   'P1 ~~ CT2' = 4,'P1 ~~ CT4' = 3,'Cons1 ~~ Cons2' = 1.7)
 path_4 <- set_curve(path_3, curve_list_1)
 plot(path_4)
-legend("bottomleft",
-       legend = "*=p<0.05 **=p<0.01 ***=p<0.001",
-       bty = "n",
+legend('bottomleft',
+       legend = '*=p<0.05 **=p<0.01 ***=p<0.001',
+       bty = 'n',
        cex = 1,
        text.font = 6)
-legend("topleft",
-       legend = "Figure 2. Science Rejection SEM model 2",
-       bty = "n",
+legend('topleft',
+       legend = 'Figure 2. Science Rejection SEM model 2',
+       bty = 'n',
        text.font = 6,
        cex = 1.5)
 ##########################################################################################################################
