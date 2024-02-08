@@ -9,79 +9,58 @@ options(max.print=999999)
 set.seed(2024)
 "Functions"
 #CLICK TO FOLD/UNFOLD#####################################################################################################
-reorder11 <- function(x) {ifelse(x == 0, 10, ifelse(x == 1, 9, 
-                                                    ifelse(x == 2, 8, 
-                                                           ifelse(x == 3, 7, 
-                                                                  ifelse(x == 4, 6, 
-                                                                         ifelse(x == 5, 5, 
-                                                                                ifelse(x == 6, 4, 
-                                                                                       ifelse(x == 7, 3, 
-                                                                                              ifelse(x == 8, 2, 
-                                                                                                     ifelse(x == 9, 1, 0))))))))))}
+reorder11 <- function(x) {
+  lookup_table <- c(10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+  lookup_table[x + 1]
+}
 ##########################################################################################################################
 
 "Data processing"
 #CLICK TO FOLD/UNFOLD#####################################################################################################
 LAIC$critical_thinking <- rowSums(LAIC[c('pensacrit2','pensacrit3','pensacrit4','menteab3','pensalog1','necontrol1')])
-LAIC$conspiracionism <- rowSums(LAIC[c('conspiragen1','conspiragen2','conspiracien1','conspiracien2')])
+LAIC$conspiracionism <- rowSums(LAIC[c('conspiragen2','conspiracien1','conspiracien2')])
 LAIC$progressive <- rowSums(LAIC[c('Universalismo','npe3','npe2','idprogre2','idprogre3')])
 LAIC$conservative <- rowSums(LAIC[c('idconserva1','idconserva2','idconserva4','npe1')])
 LAIC$manichaeism <- rowSums(LAIC[c('polariza1','polariza2','polariza3','dogmat1','dogmat2','dogmat3')])
 df_scales <- LAIC[c('critical_thinking','conspiracionism','progressive','conservative','manichaeism')]
 
-LAIC$age6 <- ifelse((LAIC$Edad == 1 | LAIC$Edad == 2), 1,
-                     ifelse((LAIC$Edad == 3 | LAIC$Edad == 4), 2,
-                            ifelse((LAIC$Edad == 5 | LAIC$Edad == 6), 3,
-                                   ifelse((LAIC$Edad == 7 | LAIC$Edad == 8), 4,
-                                          ifelse((LAIC$Edad == 9 | LAIC$Edad == 10), 5, 6)))))
-
-LAIC$education5 <- ifelse((LAIC$Nivel_Estudio == 0 | LAIC$Nivel_Estudio == 1 | LAIC$Nivel_Estudio == 2), 1,
-                        ifelse((LAIC$Nivel_Estudio == 3 | LAIC$Nivel_Estudio == 4 | LAIC$Nivel_Estudio == 5), 2,
-                               ifelse((LAIC$Nivel_Estudio == 6 | LAIC$Nivel_Estudio == 7), 3,
-                                      ifelse(LAIC$Nivel_Estudio == 8, 4,
-                                             ifelse((LAIC$Nivel_Estudio == 9 | LAIC$Nivel_Estudio == 10), 5, 99)))))
+LAIC$age6 <- cut(LAIC$Edad, breaks = c(0, 2, 4, 6, 8, 10, Inf), labels = c(1, 2, 3, 4, 5, 6), include.lowest = TRUE)
+LAIC$education5 <- cut(LAIC$Nivel_Estudio,breaks = c(-Inf, 2, 5, 7, 8, 10, Inf),labels = c(1, 2, 3, 4, 5, 99),include.lowest = TRUE)
 
 science_reject_variables <- as.data.frame(apply(LAIC[c('Nu_1','Nu_8','Nu_13','Nu_25','Nu_26','Nu_34')], 2, reorder11))
 colnames(science_reject_variables) <- c('Nu_1r','Nu_8r','Nu_13r','Nu_25r','Nu_26r','Nu_34r')
 LAIC <- cbind(LAIC, science_reject_variables)
 
 df_model_items <- LAIC[c('Nu_1r','Nu_8r','Nu_13r','Nu_25r','Nu_26r','Nu_34r','pensacrit2','pensacrit3','pensacrit4','menteab3','necontrol1',
-                         'conspiragen1','conspiragen2','conspiracien1','conspiracien2','Universalismo','npe3','npe2','idprogre2','idprogre3','idconserva1',
+                         'conspiragen2','conspiracien1','conspiracien2','Universalismo','npe3','npe2','idprogre2','idprogre3','idconserva1',
                          'idconserva2','idconserva4','npe1','polariza1','polariza2','polariza3','dogmat1','dogmat2','dogmat3')]
 ##########################################################################################################################
 
 "Descriptive statistics"
 #CLICK TO FOLD/UNFOLD#####################################################################################################
-
-# Distribution and age in the sample
+# Distribution of age and education level in the sample
 age_education_table <- data.frame(sapply(LAIC[, c(132:133)], table))
-
 # Mean, NMAD, Min and Max
 model_descriptives <- data.frame(sapply(df_model_items, function(x) mean(x, trim=0.2)), sapply(df_model_items, mad), sapply(df_model_items, min),
                                  sapply(df_model_items, max))
 model_descriptives <- cbind(index = row.names(model_descriptives), model_descriptives)
 names(model_descriptives) <- c('Items','Trimmed mean*','NMAD','Min','Max')
 row.names(model_descriptives) <- NULL
-
 # Alpha and Omega
-alpha(LAIC[, c('Nu_1r','Nu_8r','Nu_13r','Nu_25r','Nu_26r','Nu_34r')], check.keys=TRUE)
-omega(LAIC[, c('Nu_1r','Nu_8r','Nu_13r','Nu_25r','Nu_26r','Nu_34r')])
-
-alpha(LAIC[, c('pensacrit2','pensacrit3','pensacrit4','menteab3','necontrol1')], check.keys=TRUE)
-omega(LAIC[, c('pensacrit2','pensacrit3','pensacrit4','menteab3','necontrol1')])
-
-alpha(LAIC[, c('conspiragen1','conspiragen2','conspiracien1','conspiracien2')], check.keys=TRUE)
-omega(LAIC[, c('conspiragen1','conspiragen2','conspiracien1','conspiracien2')],rotate='simplimax')
-
-alpha(LAIC[, c('Universalismo','npe3','npe2','idprogre2','idprogre3')], check.keys=TRUE)
-omega(LAIC[, c('Universalismo','npe3','npe2','idprogre2','idprogre3')],rotate='Promax')
-
-alpha(LAIC[, c('idconserva1','idconserva2','idconserva4','npe1')], check.keys=TRUE)
-omega(LAIC[, c('idconserva1','idconserva2','idconserva4','npe1')])
-
-alpha(LAIC[, c('polariza1','polariza2','polariza3','dogmat1','dogmat2','dogmat3')], check.keys=TRUE)
-omega(LAIC[, c('polariza1','polariza2','polariza3','dogmat1','dogmat2','dogmat3')])
-
+Alpha_omega <- data.frame()
+Alpha_omega[1,1] <- round(psych::alpha(LAIC[, c('Nu_1r','Nu_8r','Nu_13r','Nu_25r','Nu_26r','Nu_34r')], check.keys=TRUE)[['total']][['std.alpha']], digits = 2)
+Alpha_omega[1,2] <- round(omega(LAIC[, c('Nu_1r','Nu_8r','Nu_13r','Nu_25r','Nu_26r','Nu_34r')])[['omega.tot']], digits = 2)
+Alpha_omega[2,1] <- round(psych::alpha(LAIC[, c('pensacrit2','pensacrit3','pensacrit4','menteab3','necontrol1')], check.keys=TRUE)[['total']][['std.alpha']], digits = 2)
+Alpha_omega[2,2] <- round(omega(LAIC[, c('pensacrit2','pensacrit3','pensacrit4','menteab3','necontrol1')])[['omega.tot']], digits = 2)
+Alpha_omega[3,1] <- round(psych::alpha(LAIC[, c('conspiragen2','conspiracien1','conspiracien2')], check.keys=TRUE)[['total']][['std.alpha']], digits = 2)
+Alpha_omega[3,2] <- round(omega(LAIC[, c('conspiragen2','conspiracien1','conspiracien2')])[['omega.tot']], digits = 2)
+Alpha_omega[4,1] <- round(psych::alpha(LAIC[, c('Universalismo','npe3','npe2','idprogre2','idprogre3')], check.keys=TRUE)[['total']][['std.alpha']], digits = 2)
+Alpha_omega[4,2] <- round(omega(LAIC[, c('Universalismo','npe3','npe2','idprogre2','idprogre3')],rotate='Promax')[['omega.tot']], digits = 2)
+Alpha_omega[5,1] <- round(psych::alpha(LAIC[, c('idconserva1','idconserva2','idconserva4','npe1')], check.keys=TRUE)[['total']][['std.alpha']], digits = 2)
+Alpha_omega[5,2] <- round(omega(LAIC[, c('idconserva1','idconserva2','idconserva4','npe1')])[['omega.tot']], digits = 2)
+Alpha_omega[6,1] <- round(psych::alpha(LAIC[, c('polariza1','polariza2','polariza3','dogmat1','dogmat2','dogmat3')], check.keys=TRUE)[['total']][['std.alpha']], digits = 2)
+Alpha_omega[6,2] <- round(omega(LAIC[, c('polariza1','polariza2','polariza3','dogmat1','dogmat2','dogmat3')])[['omega.tot']], digits = 2)
+colnames(Alpha_omega) <- c('Alpha', 'Omega')
 # Normality and outlier detection
 univariate_normality <- data.frame(sapply(df_model_items, shapiro.test)[1:2,])
 outlier_detection <- data.frame(sapply(df_model_items, rosnerTest)[13,])
@@ -148,12 +127,12 @@ cor_matrix <- foreach(i = 1:num_vars, .combine = 'rbind') %dopar% {
 # Stop the parallel backend
 stopCluster(cl)
 # Create a new dataframe with the correlation coefficients and significance markings
-correlations <- as.data.frame(cor_matrix)
-correlations[upper.tri(correlations, diag = T)] <- NA
+correlations_scales <- as.data.frame(cor_matrix)
+correlations_scales[upper.tri(correlations_scales, diag = T)] <- NA
 # Set column and row names
-colnames(correlations) <- var_names
-rownames(correlations) <- var_names
-correlations <- cbind(index = row.names(correlations), correlations)
+colnames(correlations_scales) <- var_names
+rownames(correlations_scales) <- var_names
+correlations_scales <- cbind(index = row.names(correlations_scales), correlations_scales)
 ##########################################################################################################################
 
 "SEM assumptions"
@@ -168,7 +147,7 @@ vif_science_rejection <- lm(binary ~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r, da
 vif(vif_science_rejection)
 vif_critical_thinking <- lm(binary ~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1, data=LAIC)
 vif(vif_critical_thinking)
-vif_conspiracionism <- lm(binary ~ conspiragen1+conspiragen2+conspiracien1+conspiracien2, data=LAIC)
+vif_conspiracionism <- lm(binary ~ conspiragen2+conspiracien1+conspiracien2, data=LAIC)
 vif(vif_conspiracionism)
 vif_progressive <- lm(binary ~ Universalismo+npe3+npe2+idprogre2+idprogre3, data=LAIC)
 vif(vif_progressive)
@@ -186,7 +165,7 @@ science_rejection_no_outliers_v1 <- '
 # 1º Latent variables
 Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
 Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
-Conspiracionism =~ conspiragen1+conspiragen2+conspiracien1+conspiracien2
+Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
 Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
 Conservative =~ idconserva1+idconserva2+idconserva4+npe1
 Manichaeism =~ polariza1+polariza2+polariza3+dogmat1+dogmat2+dogmat3
@@ -204,7 +183,7 @@ science_rejection_no_outliers_v2 <- '
 # 1º Latent variables
 science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
 Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
-Conspiracionism =~ conspiragen1+conspiragen2+conspiracien1+conspiracien2
+Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
 Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
 
 # 2º Path
@@ -214,7 +193,6 @@ science_rejection ~ Progressive + Conspiracionism + Critical_thinking
 npe3~~npe2
 pensacrit2~~pensacrit4
 Universalismo~~idprogre3
-conspiragen1~~conspiragen2
 Nu_25r~~Nu_26r
 menteab3~~Universalismo
 pensacrit3~~Universalismo
@@ -235,7 +213,7 @@ science_rejection_v1 <- '
 # 1º Latent variables
 Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
 Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
-Conspiracionism =~ conspiragen1+conspiragen2+conspiracien1+conspiracien2
+Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
 Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
 Conservative =~ idconserva1+idconserva2+idconserva4+npe1
 Manichaeism =~ polariza1+polariza2+polariza3+dogmat1+dogmat2+dogmat3
@@ -259,10 +237,9 @@ labels <- c(Nu_1r = 'SR1',
             pensacrit4 = 'CT3',
             menteab3 = 'CT4',
             necontrol1 = 'CT5',
-            conspiragen1 = 'Cons1',
-            conspiragen2 = 'Cons2',
-            conspiracien1 = 'Cons3',
-            conspiracien2 = 'Cons4',
+            conspiragen2 = 'Cons1',
+            conspiracien1 = 'Cons2',
+            conspiracien2 = 'Cons3',
             Universalismo = 'P1',
             npe3 = 'P2',
             npe2 = 'P3',
@@ -285,7 +262,35 @@ labels <- c(Nu_1r = 'SR1',
             Conservative='Conservative',
             Manichaeism='Manichaeism')
 
+m<-matrix(c("M1",	NA,	NA,	NA,	NA,	NA,	NA,
+            "M2",	NA,	NA,	NA,	NA,	NA,	NA,
+            "M3",	NA,	NA,	NA,	NA,	NA,	NA,
+            NA,	NA,	"Manichaeism",	NA,	NA,	NA,	NA,
+            "M4",	NA,	NA,	NA,	NA,	NA,	NA,
+            "M5",	NA,	NA,	NA,	NA,	NA,	NA,
+            "M6",	NA,	NA,	NA,	NA,	NA,	NA,
+            "C1",	NA,	NA,	NA,	NA,	NA,	NA,
+            "C2",	NA,	NA,	NA,	NA,	NA,	NA,
+            NA,	NA,	"Conservative",	NA,	NA,	NA,	"SR1",
+            "C3",	NA,	NA,	NA,	NA,	NA,	"SR2",
+            "C4",	NA,	NA,	NA,	NA,	NA,	"SR3",
+            "P1",	NA,	NA,	NA,	"Science Rejection",	NA,	NA,
+            "P2",	NA,	NA,	NA,	NA,	NA,	"SR4",
+            "P3",	NA,	"Progressive",	NA,	NA,	NA,	"SR5",
+            "P4",	NA,	NA,	NA,	NA,	NA,	"SR6",
+            "P5",	NA,	NA,	NA,	NA,	NA,	NA,
+            "Cons1",	NA,	NA,	NA,	NA,	NA,	NA,
+            "Cons2",	NA,	"Conspiracionism",	NA,	NA,	NA,	NA,
+            "Cons3",	NA,	NA,	NA,	NA,	NA,	NA,
+            "CT1",	NA,	NA,	NA,	NA,	NA,	NA,
+            "CT2",	NA,	NA,	NA,	NA,	NA,	NA,
+            "CT3",	NA,	"Critical Thinking",	NA,	NA,	NA,	NA,
+            "CT4",	NA,	NA,	NA,	NA,	NA,	NA,
+            "CT5",	NA,	NA,	NA,	NA,	NA,	NA),byrow=TRUE,25,7)
+
 path<- semPaths(science_rejection_v1, what = 'std',
+                nodeLabels = labels,
+                layout = m,
                 residuals = FALSE, 
                 edge.color = 'black', 
                 fade = FALSE, 
@@ -301,7 +306,7 @@ path<- semPaths(science_rejection_v1, what = 'std',
                 edge.width = 0.8,
                 rotation = 2)
 path_2 <- mark_sig(path, science_rejection_v1)
-path_3 <- change_node_label(path_2, labels)
+#path_3 <- change_node_label(path_2, labels)
 
 curve_list_1 <- c('Critical Thinking ~~ Conspiracionism' = 15)
 path_4 <- set_curve(path_3, curve_list_1)
@@ -322,7 +327,7 @@ science_rejection_v2 <- '
 # 1º Latent variables
 Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
 Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
-Conspiracionism =~ conspiragen1+conspiragen2+conspiracien1+conspiracien2
+Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
 Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
 
 # 2º Path
@@ -332,7 +337,6 @@ Science_rejection ~ Progressive + Conspiracionism + Critical_thinking
 npe3~~npe2
 pensacrit2~~pensacrit4
 Universalismo~~idprogre3
-conspiragen1~~conspiragen2
 Nu_25r~~Nu_26r
 menteab3~~Universalismo
 pensacrit3~~Universalismo
@@ -355,10 +359,9 @@ labels <- c(Nu_1r = 'SR1',
             pensacrit4 = 'CT3',
             menteab3 = 'CT4',
             necontrol1 = 'CT5',
-            conspiragen1 = 'Cons1',
-            conspiragen2 = 'Cons2',
-            conspiracien1 = 'Cons3',
-            conspiracien2 = 'Cons4',
+            conspiragen2 = 'Cons1',
+            conspiracien1 = 'Cons2',
+            conspiracien2 = 'Cons3',
             Universalismo = 'P1',
             npe3 = 'P2',
             npe2 = 'P3',
@@ -387,8 +390,8 @@ path<- semPaths(science_rejection_v2, what = 'std',
 path_2 <- mark_sig(path, science_rejection_v2)
 path_3 <- change_node_label(path_2, labels)
 
-curve_list_1 <- c('CT1 ~~ CT4' = 2.8,'CT1 ~~ CT3' = 1.7,'P2 ~~ P3' = 1.7,'P1 ~~ P5' = 3,
-                  'P1 ~~ CT2' = 4,'P1 ~~ CT4' = 3,'Cons1 ~~ Cons2' = 1.7)
+curve_list_1 <- c('P2 ~~ P3'=1.7,'CT1 ~~ CT3'=3,'P1 ~~ P5'=3,'SR4 ~~ SR5'=-2,
+                  'CT4 ~~ P1'=2,'CT2 ~~ P1'=4,'CT1 ~~ CT4'=1.7,'SR2 ~~ SR3'=-2)
 path_4 <- set_curve(path_3, curve_list_1)
 plot(path_4)
 legend('bottomleft',
