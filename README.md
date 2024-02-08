@@ -4,7 +4,7 @@ Online repository of research based on the LAIC questionnaire
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-# CODE
+# Code
 Data_cleansing_code.R file: this script cleans, reorders and recodes the BBDD_LAIC.RData file to generate the processed LAIC.RData file.
 Science_Rejection_Analysis_Code.R: this script contains all the code used in the analysis of the Science Rejection paper.
 
