@@ -30,3 +30,6 @@ An Excel file with the results of Science_Rejection_Analysis_Code.R in order and
    -SEM_models: several tables with the SEM results and the outlier SEM models.
 
    -SEM_plot: two plots of the initial and final SEM models.
+   
+# Science_Rejection_Paper.docx
+Word file with a draft of the paper. Updated regularly.
