@@ -1,9 +1,9 @@
 "Data and library load"
-load('//cendat/u7443/w2000/Escritorio/CIEMAT/Science_Rejection_Paper/Archivos_gitHub/LAIC.RData') # Add path here.
+load('/LAIC.RData') # Add path here.
 "
-install.packages(c('dplyr','Hmisc','scales','psych','lavaan','ltm','QuantPsyc','energy','semPlot','WRS2','semptools','EnvStats','car','writexl','doParallel'))
+install.packages(c('Hmisc','scales','psych','lavaan','QuantPsyc','energy','semPlot','WRS2','semptools','EnvStats','car','doParallel'))
 "
-lapply(c('dplyr','Hmisc','scales','psych','GPArotation','lavaan','ltm','QuantPsyc','energy','semPlot','WRS2','semptools','EnvStats','car','writexl','doParallel'), 
+lapply(c('Hmisc','scales','psych','lavaan','QuantPsyc','energy','semPlot','WRS2','semptools','EnvStats','car','doParallel'), 
        require, character.only = TRUE)
 options(max.print=999999)
 set.seed(2024)
@@ -46,6 +46,8 @@ model_descriptives <- data.frame(sapply(df_model_items, function(x) mean(x, trim
 model_descriptives <- cbind(index = row.names(model_descriptives), model_descriptives)
 names(model_descriptives) <- c('Items','Trimmed mean*','NMAD','Min','Max')
 row.names(model_descriptives) <- NULL
+# Distribution of the Science Rejection indicator
+Science_rejection <- data.frame(sapply(LAIC[, c('Nu_1r','Nu_8r','Nu_13r','Nu_25r','Nu_26r','Nu_34r')],table))
 # Alpha and Omega
 Alpha_omega <- data.frame()
 Alpha_omega[1,1] <- round(psych::alpha(LAIC[, c('Nu_1r','Nu_8r','Nu_13r','Nu_25r','Nu_26r','Nu_34r')], check.keys=TRUE)[['total']][['std.alpha']], digits = 2)
