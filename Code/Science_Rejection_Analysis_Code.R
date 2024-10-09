@@ -1,5 +1,5 @@
 "Data and library load"
-load('C:/Users/EQUIPO1/Desktop/CIEMAT/Science_Rejection_Paper/Archivos_gitHub/LAIC.RData') # Add path here.
+load('/LAIC.RData') # Add path here.
 "
 install.packages(c('Hmisc','scales','psych','lavaan','QuantPsyc','energy','semPlot','WRS2','semptools','EnvStats','car','doParallel'))
 "
