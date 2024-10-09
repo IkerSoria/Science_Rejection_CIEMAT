@@ -311,7 +311,7 @@ path_2 <- mark_sig(path, science_rejection_v1)
 #path_3 <- change_node_label(path_2, labels)
 
 curve_list_1 <- c('Critical Thinking ~~ Conspiracionism' = 15)
-path_4 <- set_curve(path_3, curve_list_1)
+path_4 <- set_curve(path_2, curve_list_1)
 plot(path_4)
 legend('bottomleft',
        legend = '*=p<0.05 **=p<0.01 ***=p<0.001',
