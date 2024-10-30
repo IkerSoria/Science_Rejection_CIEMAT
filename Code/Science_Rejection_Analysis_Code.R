@@ -44,7 +44,7 @@ age_education_table <- data.frame(sapply(LAIC[, c(132:133)], table))
 model_descriptives <- data.frame(sapply(df_model_items, function(x) mean(x, trim=0.2)), sapply(df_model_items, mad), sapply(df_model_items, min),
                                  sapply(df_model_items, max))
 model_descriptives <- cbind(index = row.names(model_descriptives), model_descriptives)
-names(model_descriptives) <- c('Items','Trimmed mean*','NMAD','Min','Max')
+names(model_descriptives) <- c('Items','Trimmed mean*','MAD','Min','Max')
 row.names(model_descriptives) <- NULL
 # Distribution of the Science Rejection indicator
 Science_rejection <- data.frame(sapply(LAIC[, c('Nu_1r','Nu_8r','Nu_13r','Nu_25r','Nu_26r','Nu_34r')],table))
@@ -322,8 +322,142 @@ legend('topleft',
        text.font = 6,
        cex = 1.5)
 
-"Model 2"
+
+"Iterations"
+# First we drop the non significant variables
 science_rejection_v2 <- '
+# 1º Latent variables
+Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
+Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
+Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
+Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
+
+# 2º Path
+Science_rejection ~ Critical_thinking + Conspiracionism + Progressive
+'
+science_rejection_v2 <- sem(science_rejection_v2, LAIC, se='bootstrap', bootstrap=10000)
+parameterEstimates(science_rejection_v2, ci=TRUE, level=0.95, boot.ci.type='perc', standardized = TRUE)
+summary(science_rejection_v2, standardized = TRUE, fit.measures=TRUE, rsquare=TRUE)
+fitmeasures(science_rejection_v2, c('cfi', 'tli', 'RMSEA', 'srmr', 'gfi', 'agfi'))
+
+
+# Suggested correlations
+ideas <- data.frame(modindices(science_rejection_v2)[order(modindices(science_rejection_v2)$mi, decreasing = TRUE), ])
+
+
+# Add correlations
+science_rejection_v3 <- '
+# 1º Latent variables
+Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
+Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
+Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
+Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
+
+# 2º Path
+Science_rejection ~ Critical_thinking + Conspiracionism + Progressive
+
+# Covariances
+npe3~~npe2
+'
+science_rejection_v3 <- sem(science_rejection_v3, LAIC, se='bootstrap', bootstrap=10000)
+parameterEstimates(science_rejection_v3, ci=TRUE, level=0.95, boot.ci.type='perc', standardized = TRUE)
+summary(science_rejection_v3, standardized = TRUE, fit.measures=TRUE, rsquare=TRUE)
+fitmeasures(science_rejection_v3, c('cfi', 'tli', 'RMSEA', 'srmr', 'gfi', 'agfi'))
+ideas <- data.frame(modindices(science_rejection_v3)[order(modindices(science_rejection_v3)$mi, decreasing = TRUE), ])
+
+
+science_rejection_v4 <- '
+# 1º Latent variables
+Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
+Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
+Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
+Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
+
+# 2º Path
+Science_rejection ~ Critical_thinking + Conspiracionism + Progressive
+
+# Covariances
+npe3~~npe2
+pensacrit2~~pensacrit4
+'
+science_rejection_v4 <- sem(science_rejection_v4, LAIC, se='bootstrap', bootstrap=10000)
+parameterEstimates(science_rejection_v4, ci=TRUE, level=0.95, boot.ci.type='perc', standardized = TRUE)
+summary(science_rejection_v4, standardized = TRUE, fit.measures=TRUE, rsquare=TRUE)
+fitmeasures(science_rejection_v4, c('cfi', 'tli', 'RMSEA', 'srmr', 'gfi', 'agfi'))
+ideas <- data.frame(modindices(science_rejection_v4)[order(modindices(science_rejection_v4)$mi, decreasing = TRUE), ])
+
+
+science_rejection_v5 <- '
+# 1º Latent variables
+Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
+Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
+Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
+Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
+
+# 2º Path
+Science_rejection ~ Critical_thinking + Conspiracionism + Progressive
+
+# Covariances
+npe3~~npe2
+pensacrit2~~pensacrit4
+Universalismo~~idprogre3
+'
+science_rejection_v5 <- sem(science_rejection_v5, LAIC, se='bootstrap', bootstrap=10000)
+parameterEstimates(science_rejection_v5, ci=TRUE, level=0.95, boot.ci.type='perc', standardized = TRUE)
+summary(science_rejection_v5, standardized = TRUE, fit.measures=TRUE, rsquare=TRUE)
+fitmeasures(science_rejection_v5, c('cfi', 'tli', 'RMSEA', 'srmr', 'gfi', 'agfi'))
+ideas <- data.frame(modindices(science_rejection_v5)[order(modindices(science_rejection_v5)$mi, decreasing = TRUE), ])
+
+
+science_rejection_v6 <- '
+# 1º Latent variables
+Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
+Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
+Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
+Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
+
+# 2º Path
+Science_rejection ~ Critical_thinking + Conspiracionism + Progressive
+
+# Covariances
+npe3~~npe2
+pensacrit2~~pensacrit4
+Universalismo~~idprogre3
+Nu_25r~~Nu_26r
+'
+science_rejection_v6 <- sem(science_rejection_v6, LAIC, se='bootstrap', bootstrap=10000)
+parameterEstimates(science_rejection_v6, ci=TRUE, level=0.95, boot.ci.type='perc', standardized = TRUE)
+summary(science_rejection_v6, standardized = TRUE, fit.measures=TRUE, rsquare=TRUE)
+fitmeasures(science_rejection_v6, c('cfi', 'tli', 'RMSEA', 'srmr', 'gfi', 'agfi'))
+ideas <- data.frame(modindices(science_rejection_v6)[order(modindices(science_rejection_v6)$mi, decreasing = TRUE), ])
+
+
+science_rejection_v7 <- '
+# 1º Latent variables
+Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
+Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
+Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
+Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
+
+# 2º Path
+Science_rejection ~ Critical_thinking + Conspiracionism + Progressive
+
+# Covariances
+npe3~~npe2
+pensacrit2~~pensacrit4
+Universalismo~~idprogre3
+Nu_25r~~Nu_26r
+pensacrit2~~menteab3
+'
+science_rejection_v7 <- sem(science_rejection_v7, LAIC, se='bootstrap', bootstrap=10000)
+parameterEstimates(science_rejection_v7, ci=TRUE, level=0.95, boot.ci.type='perc', standardized = TRUE)
+summary(science_rejection_v7, standardized = TRUE, fit.measures=TRUE, rsquare=TRUE)
+fitmeasures(science_rejection_v7, c('cfi', 'tli', 'RMSEA', 'srmr', 'gfi', 'agfi'))
+ideas <- data.frame(modindices(science_rejection_v7)[order(modindices(science_rejection_v7)$mi, decreasing = TRUE), ])
+
+
+"Final model"
+science_rejection_v8 <- '
 # 1º Latent variables
 Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
 Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
@@ -341,10 +475,10 @@ Nu_25r~~Nu_26r
 pensacrit2~~menteab3
 Nu_8r~~Nu_13r
 '
-science_rejection_v2 <- sem(science_rejection_v2, LAIC, se='bootstrap', bootstrap=10000)
-parameterEstimates(science_rejection_v2, ci=TRUE, level=0.95, boot.ci.type='perc', standardized = TRUE)
-summary(science_rejection_v2, standardized = TRUE, fit.measures=TRUE, rsquare=TRUE)
-fitmeasures(science_rejection_v2, c('cfi', 'tli', 'RMSEA', 'srmr', 'gfi', 'agfi'))
+science_rejection_v8 <- sem(science_rejection_v8, LAIC, se='bootstrap', bootstrap=10000)
+parameterEstimates(science_rejection_v8, ci=TRUE, level=0.95, boot.ci.type='perc', standardized = TRUE)
+summary(science_rejection_v8, standardized = TRUE, fit.measures=TRUE, rsquare=TRUE)
+fitmeasures(science_rejection_v8, c('cfi', 'tli', 'RMSEA', 'srmr', 'gfi', 'agfi'))
 
 labels <- c(Nu_1r = 'SR1',
             Nu_8r = 'SR2',
@@ -370,7 +504,7 @@ labels <- c(Nu_1r = 'SR1',
             Conspiracionism='Conspiracy thinking',
             Progressive='Progressive')
 
-path<- semPaths(science_rejection_v2, what = 'std',
+path<- semPaths(science_rejection_v8, what = 'std',
                 residuals = FALSE, 
                 edge.color = 'black', 
                 fade = FALSE, 
@@ -385,7 +519,7 @@ path<- semPaths(science_rejection_v2, what = 'std',
                 exoCov = F,
                 edge.width = 0.8,
                 rotation = 2)
-path_2 <- mark_sig(path, science_rejection_v2)
+path_2 <- mark_sig(path, science_rejection_v8)
 path_3 <- change_node_label(path_2, labels)
 
 curve_list_1 <- c('P2 ~~ P3'=1.7,'CT1 ~~ CT3'=3,'P1 ~~ P5'=3,'SR4 ~~ SR5'=-2,
