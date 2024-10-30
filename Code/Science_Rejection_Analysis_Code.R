@@ -1,4 +1,5 @@
 "Data and library load"
+#CLICK TO FOLD/UNFOLD#####################################################################################################
 load('/LAIC.RData') # Add path here.
 "
 install.packages(c('Hmisc','scales','psych','lavaan','QuantPsyc','energy','semPlot','WRS2','semptools','EnvStats','car','doParallel'))
@@ -8,7 +9,6 @@ lapply(c('Hmisc','scales','psych','lavaan','QuantPsyc','energy','semPlot','WRS2'
 options(max.print=999999)
 set.seed(2024)
 "Functions"
-#CLICK TO FOLD/UNFOLD#####################################################################################################
 reorder11 <- function(x) {
   lookup_table <- c(10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
   lookup_table[x + 1]
@@ -196,8 +196,6 @@ npe3~~npe2
 pensacrit2~~pensacrit4
 Universalismo~~idprogre3
 Nu_25r~~Nu_26r
-menteab3~~Universalismo
-pensacrit3~~Universalismo
 pensacrit2~~menteab3
 Nu_8r~~Nu_13r
 '
@@ -259,7 +257,7 @@ labels <- c(Nu_1r = 'SR1',
             dogmat3 = 'M6',
             Science_rejection='Science Rejection',
             Critical_thinking='Critical Thinking',
-            Conspiracionism='Conspiracionism',
+            Conspiracionism='Conspiracy Thinking',
             Progressive='Progressive',
             Conservative='Conservative',
             Polarized_thinking='Polarized_thinking')
@@ -282,7 +280,7 @@ m<-matrix(c("M1",	NA,	NA,	NA,	NA,	NA,	NA,
             "P4",	NA,	NA,	NA,	NA,	NA,	"SR6",
             "P5",	NA,	NA,	NA,	NA,	NA,	NA,
             "Cons1",	NA,	NA,	NA,	NA,	NA,	NA,
-            "Cons2",	NA,	"Conspiracionism",	NA,	NA,	NA,	NA,
+            "Cons2",	NA,	"Conspiracy Thinking",	NA,	NA,	NA,	NA,
             "Cons3",	NA,	NA,	NA,	NA,	NA,	NA,
             "CT1",	NA,	NA,	NA,	NA,	NA,	NA,
             "CT2",	NA,	NA,	NA,	NA,	NA,	NA,
@@ -340,8 +338,6 @@ npe3~~npe2
 pensacrit2~~pensacrit4
 Universalismo~~idprogre3
 Nu_25r~~Nu_26r
-menteab3~~Universalismo
-pensacrit3~~Universalismo
 pensacrit2~~menteab3
 Nu_8r~~Nu_13r
 '
@@ -371,7 +367,7 @@ labels <- c(Nu_1r = 'SR1',
             idprogre3 = 'P5',
             Science_rejection='Science Rejection',
             Critical_thinking='Critical Thinking',
-            Conspiracionism='Conspiracionism',
+            Conspiracionism='Conspiracy thinking',
             Progressive='Progressive')
 
 path<- semPaths(science_rejection_v2, what = 'std',
@@ -393,7 +389,7 @@ path_2 <- mark_sig(path, science_rejection_v2)
 path_3 <- change_node_label(path_2, labels)
 
 curve_list_1 <- c('P2 ~~ P3'=1.7,'CT1 ~~ CT3'=3,'P1 ~~ P5'=3,'SR4 ~~ SR5'=-2,
-                  'CT4 ~~ P1'=2,'CT2 ~~ P1'=4,'CT1 ~~ CT4'=1.7,'SR2 ~~ SR3'=-2)
+                  'CT1 ~~ CT4'=1.7,'SR2 ~~ SR3'=-2)
 path_4 <- set_curve(path_3, curve_list_1)
 plot(path_4)
 legend('bottomleft',
