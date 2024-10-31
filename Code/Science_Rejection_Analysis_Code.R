@@ -17,7 +17,7 @@ reorder11 <- function(x) {
 
 "Data processing"
 #CLICK TO FOLD/UNFOLD#####################################################################################################
-LAIC$critical_thinking <- rowSums(LAIC[c('pensacrit2','pensacrit3','pensacrit4','menteab3','pensalog1','necontrol1')])
+LAIC$critical_thinking <- rowSums(LAIC[c('pensacrit2','pensacrit3','pensacrit4','menteab3','pensalog1')])
 LAIC$conspiracionism <- rowSums(LAIC[c('conspiragen2','conspiracien1','conspiracien2')])
 LAIC$progressive <- rowSums(LAIC[c('Universalismo','npe3','npe2','idprogre2','idprogre3')])
 LAIC$conservative <- rowSums(LAIC[c('idconserva1','idconserva2','idconserva4','npe1')])
@@ -31,9 +31,9 @@ science_reject_variables <- as.data.frame(apply(LAIC[c('Nu_1','Nu_8','Nu_13','Nu
 colnames(science_reject_variables) <- c('Nu_1r','Nu_8r','Nu_13r','Nu_25r','Nu_26r','Nu_34r')
 LAIC <- cbind(LAIC, science_reject_variables)
 
-df_model_items <- LAIC[c('Nu_1r','Nu_8r','Nu_13r','Nu_25r','Nu_26r','Nu_34r','pensacrit2','pensacrit3','pensacrit4','menteab3','necontrol1',
-                         'conspiragen2','conspiracien1','conspiracien2','Universalismo','npe3','npe2','idprogre2','idprogre3','idconserva1',
-                         'idconserva2','idconserva4','npe1','polariza1','polariza2','polariza3','dogmat1','dogmat2','dogmat3')]
+df_model_items <- LAIC[c('Nu_1r','Nu_8r','Nu_13r','Nu_25r','Nu_26r','Nu_34r','pensacrit2','pensacrit3','pensacrit4','menteab3','conspiragen2',
+                         'conspiracien1','conspiracien2','Universalismo','npe3','npe2','idprogre2','idprogre3','idconserva1','idconserva2',
+                         'idconserva4','npe1','polariza1','polariza2','polariza3','dogmat1','dogmat2','dogmat3')]
 ##########################################################################################################################
 
 "Descriptive statistics"
@@ -52,8 +52,8 @@ Science_rejection <- data.frame(sapply(LAIC[, c('Nu_1r','Nu_8r','Nu_13r','Nu_25r
 Alpha_omega <- data.frame()
 Alpha_omega[1,1] <- round(psych::alpha(LAIC[, c('Nu_1r','Nu_8r','Nu_13r','Nu_25r','Nu_26r','Nu_34r')], check.keys=TRUE)[['total']][['std.alpha']], digits = 2)
 Alpha_omega[1,2] <- round(omega(LAIC[, c('Nu_1r','Nu_8r','Nu_13r','Nu_25r','Nu_26r','Nu_34r')])[['omega.tot']], digits = 2)
-Alpha_omega[2,1] <- round(psych::alpha(LAIC[, c('pensacrit2','pensacrit3','pensacrit4','menteab3','necontrol1')], check.keys=TRUE)[['total']][['std.alpha']], digits = 2)
-Alpha_omega[2,2] <- round(omega(LAIC[, c('pensacrit2','pensacrit3','pensacrit4','menteab3','necontrol1')])[['omega.tot']], digits = 2)
+Alpha_omega[2,1] <- round(psych::alpha(LAIC[, c('pensacrit2','pensacrit3','pensacrit4','menteab3')], check.keys=TRUE)[['total']][['std.alpha']], digits = 2)
+Alpha_omega[2,2] <- round(omega(LAIC[, c('pensacrit2','pensacrit3','pensacrit4','menteab3')])[['omega.tot']], digits = 2)
 Alpha_omega[3,1] <- round(psych::alpha(LAIC[, c('conspiragen2','conspiracien1','conspiracien2')], check.keys=TRUE)[['total']][['std.alpha']], digits = 2)
 Alpha_omega[3,2] <- round(omega(LAIC[, c('conspiragen2','conspiracien1','conspiracien2')])[['omega.tot']], digits = 2)
 Alpha_omega[4,1] <- round(psych::alpha(LAIC[, c('Universalismo','npe3','npe2','idprogre2','idprogre3')], check.keys=TRUE)[['total']][['std.alpha']], digits = 2)
@@ -147,7 +147,7 @@ mvnorm.etest(df_model_items, R=10000) # Depending on your computer this line may
 LAIC$binary <- rbinom(nrow(LAIC), 1, 0.5)
 vif_science_rejection <- lm(binary ~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r, data=LAIC)
 vif(vif_science_rejection)
-vif_critical_thinking <- lm(binary ~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1, data=LAIC)
+vif_critical_thinking <- lm(binary ~ pensacrit2+pensacrit3+pensacrit4+menteab3, data=LAIC)
 vif(vif_critical_thinking)
 vif_conspiracionism <- lm(binary ~ conspiragen2+conspiracien1+conspiracien2, data=LAIC)
 vif(vif_conspiracionism)
@@ -166,7 +166,7 @@ LAIC_no_outliers <- subset(LAIC, !ID %in% outlier_IDs)
 science_rejection_no_outliers_v1 <- '
 # 1º Latent variables
 Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
-Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
+Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3
 Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
 Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
 Conservative =~ idconserva1+idconserva2+idconserva4+npe1
@@ -176,15 +176,15 @@ Polarized_thinking =~ polariza1+polariza2+polariza3+dogmat1+dogmat2+dogmat3
 Science_rejection ~ Critical_thinking + Conspiracionism + Progressive + Conservative + Polarized_thinking
 '
 science_rejection_no_outliers_v1 <- sem(science_rejection_no_outliers_v1, LAIC_no_outliers, se='bootstrap', bootstrap=10000)
-parameterEstimates(science_rejection_no_outliers_v1, ci=TRUE, level=0.95, boot.ci.type='perc', standardized = TRUE)
-summary(science_rejection_no_outliers_v1, standardized = TRUE, fit.measures=TRUE, rsquare=TRUE)
+parameterEstimates(science_rejection_no_outliers_v1, ci=T, level=0.95, boot.ci.type='perc', standardized=T)
+summary(science_rejection_no_outliers_v1, standardized=TRUE, fit.measures=TRUE, rsquare=TRUE)
 fitmeasures(science_rejection_no_outliers_v1, c('cfi', 'tli', 'RMSEA', 'srmr', 'gfi', 'agfi'))
 
 "Model 2"
 science_rejection_no_outliers_v2 <- '
 # 1º Latent variables
 science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
-Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
+Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3
 Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
 Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
 
@@ -198,6 +198,7 @@ Universalismo~~idprogre3
 Nu_25r~~Nu_26r
 pensacrit2~~menteab3
 Nu_8r~~Nu_13r
+Nu_8r~~Nu_26r
 '
 science_rejection_no_outliers_v2 <- sem(science_rejection_no_outliers_v2, LAIC_no_outliers, se='bootstrap', bootstrap=10000)
 parameterEstimates(science_rejection_no_outliers_v2, ci=TRUE, level=0.95, boot.ci.type='perc', standardized = TRUE)
@@ -212,7 +213,7 @@ rm(df_scales,science_reject_variables,df_model_items,univariate_normality,outlie
 science_rejection_v1 <- '
 # 1º Latent variables
 Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
-Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
+Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3
 Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
 Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
 Conservative =~ idconserva1+idconserva2+idconserva4+npe1
@@ -236,7 +237,6 @@ labels <- c(Nu_1r = 'SR1',
             pensacrit3 = 'CT2',
             pensacrit4 = 'CT3',
             menteab3 = 'CT4',
-            necontrol1 = 'CT5',
             conspiragen2 = 'Cons1',
             conspiracien1 = 'Cons2',
             conspiracien2 = 'Cons3',
@@ -286,7 +286,7 @@ m<-matrix(c("M1",	NA,	NA,	NA,	NA,	NA,	NA,
             "CT2",	NA,	NA,	NA,	NA,	NA,	NA,
             "CT3",	NA,	"Critical Thinking",	NA,	NA,	NA,	NA,
             "CT4",	NA,	NA,	NA,	NA,	NA,	NA,
-            "CT5",	NA,	NA,	NA,	NA,	NA,	NA),byrow=TRUE,25,7)
+            "CT5",	NA,	NA,	NA,	NA,	NA,	NA),byrow=TRUE,24,7)
 
 path<- semPaths(science_rejection_v1, what = 'std',
                 nodeLabels = labels,
@@ -328,7 +328,7 @@ legend('topleft',
 science_rejection_v2 <- '
 # 1º Latent variables
 Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
-Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
+Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3
 Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
 Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
 
@@ -349,7 +349,7 @@ ideas <- data.frame(modindices(science_rejection_v2)[order(modindices(science_re
 science_rejection_v3 <- '
 # 1º Latent variables
 Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
-Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
+Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3
 Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
 Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
 
@@ -369,7 +369,7 @@ ideas <- data.frame(modindices(science_rejection_v3)[order(modindices(science_re
 science_rejection_v4 <- '
 # 1º Latent variables
 Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
-Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
+Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3
 Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
 Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
 
@@ -390,7 +390,7 @@ ideas <- data.frame(modindices(science_rejection_v4)[order(modindices(science_re
 science_rejection_v5 <- '
 # 1º Latent variables
 Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
-Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
+Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3
 Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
 Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
 
@@ -412,7 +412,7 @@ ideas <- data.frame(modindices(science_rejection_v5)[order(modindices(science_re
 science_rejection_v6 <- '
 # 1º Latent variables
 Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
-Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
+Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3
 Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
 Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
 
@@ -423,7 +423,9 @@ Science_rejection ~ Critical_thinking + Conspiracionism + Progressive
 npe3~~npe2
 pensacrit2~~pensacrit4
 Universalismo~~idprogre3
-Nu_25r~~Nu_26r
+
+pensacrit2~~menteab3
+###Nu_25r~~Nu_26r
 '
 science_rejection_v6 <- sem(science_rejection_v6, LAIC, se='bootstrap', bootstrap=10000)
 parameterEstimates(science_rejection_v6, ci=TRUE, level=0.95, boot.ci.type='perc', standardized = TRUE)
@@ -435,7 +437,7 @@ ideas <- data.frame(modindices(science_rejection_v6)[order(modindices(science_re
 science_rejection_v7 <- '
 # 1º Latent variables
 Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
-Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
+Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3
 Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
 Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
 
@@ -446,8 +448,8 @@ Science_rejection ~ Critical_thinking + Conspiracionism + Progressive
 npe3~~npe2
 pensacrit2~~pensacrit4
 Universalismo~~idprogre3
-Nu_25r~~Nu_26r
 pensacrit2~~menteab3
+Nu_25r~~Nu_26r
 '
 science_rejection_v7 <- sem(science_rejection_v7, LAIC, se='bootstrap', bootstrap=10000)
 parameterEstimates(science_rejection_v7, ci=TRUE, level=0.95, boot.ci.type='perc', standardized = TRUE)
@@ -460,7 +462,7 @@ ideas <- data.frame(modindices(science_rejection_v7)[order(modindices(science_re
 science_rejection_v8 <- '
 # 1º Latent variables
 Science_rejection =~ Nu_1r+Nu_8r+Nu_13r+Nu_25r+Nu_26r+Nu_34r
-Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3+necontrol1
+Critical_thinking =~ pensacrit2+pensacrit3+pensacrit4+menteab3
 Conspiracionism =~ conspiragen2+conspiracien1+conspiracien2
 Progressive =~ Universalismo+npe3+npe2+idprogre2+idprogre3
 
@@ -474,11 +476,13 @@ Universalismo~~idprogre3
 Nu_25r~~Nu_26r
 pensacrit2~~menteab3
 Nu_8r~~Nu_13r
+Nu_8r~~Nu_26r
 '
 science_rejection_v8 <- sem(science_rejection_v8, LAIC, se='bootstrap', bootstrap=10000)
 parameterEstimates(science_rejection_v8, ci=TRUE, level=0.95, boot.ci.type='perc', standardized = TRUE)
 summary(science_rejection_v8, standardized = TRUE, fit.measures=TRUE, rsquare=TRUE)
 fitmeasures(science_rejection_v8, c('cfi', 'tli', 'RMSEA', 'srmr', 'gfi', 'agfi'))
+
 
 labels <- c(Nu_1r = 'SR1',
             Nu_8r = 'SR2',
