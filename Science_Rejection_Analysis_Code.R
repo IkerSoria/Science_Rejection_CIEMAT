@@ -1,4 +1,4 @@
-"Data and library load"
+"Data, library load and functions"
 #CLICK TO FOLD/UNFOLD#####################################################################################################
 load('/LAIC.RData') # Add path here.
 "
