@@ -5,18 +5,16 @@ Online repository of research based on the LAIC questionnaire
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Code
-Data_cleansing_code.R file: this script cleans, reorders and recodes the BBDD_LAIC.RData file to generate the processed LAIC.RData file.
 Science_Rejection_Analysis_Code.R: this script contains all the code used in the analysis of the Science Rejection paper.
 
 # Data:
-BBDD_LAIC.RData file: this is the initial raw data file from which all of LAIC's analysis are based.
 LAIC.RData file: processed and clean file used for the analysis of the Science Rejection paper.
 
 # Results 
 Tables_and_plots.xlsx: an Excel file with the results of Science_Rejection_Analysis_Code.R in order and with publication format. There are six Excel sheets in this document:
-   -Items_and_constructs: a table with the latent variables, manifest variables and the variable statements translated from Spanish into English.
+   -Items_and_constructs: a table with the latent variables, manifest variables, the variable statements translated from Spanish into English and the Spanish original sentences.
   
-   -Descriptive_statistics: three tables with descriptive data about the composition of the sample. The first table corresponds to sociodemographic data of age and education level. The second table contains the trimmed mean, NMAD, minimun, maximum, Alpha       and Omega of the variables included in the models. The third table includes the results of the Shapiro and Rosner tests.
+   -Descriptive_statistics: three tables with descriptive data about the composition of the sample. The first table corresponds to sociodemographic data of age and education level. The second table contains the trimmed mean, MAD, minimun, maximum, Alpha       and Omega of the variables included in the models. The third table displays the frequency distribution of the Science Rejection Indicator. The fourth table includes the results of the Shapiro and Rosner tests.
   
    -Correlations: two tables with the Kendall Rank Correlation Coefficients of the manifest and latent variables of the models.
 
@@ -26,4 +24,5 @@ Tables_and_plots.xlsx: an Excel file with the results of Science_Rejection_Analy
 
    -SEM_plot: two plots of the initial and final SEM models.
 
-Science_Rejection_Paper.docx file: Word file with a draft of the paper. Updated regularly.
+# Questionnaire
+Original LAIC questionnaire.
