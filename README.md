@@ -4,11 +4,11 @@ Online repository of research based on the LAIC questionnaire
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-# Code
-Science_Rejection_Analysis_Code.R: this script contains all the code used in the analysis of the Science Rejection paper.
-
 # Data:
 LAIC.RData file: processed and clean file used for the analysis of the Science Rejection paper.
+
+# Science_Rejection_Analysis_Code.R
+This script contains all the code used in the analysis of the Science Rejection paper.
 
 # Results 
 Tables_and_plots.xlsx: an Excel file with the results of Science_Rejection_Analysis_Code.R in order and with publication format. There are six Excel sheets in this document:
